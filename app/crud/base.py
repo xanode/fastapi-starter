@@ -42,9 +42,7 @@ def patch_timezone_sqlite(obj: ModelT) -> ModelT:
     return obj
 
 
-def apply_distinct(
-    query: Select[Tuple[ModelT]], distinct: InstrumentedAttribute[Any] | None
-) -> Select[Tuple[ModelT]]:
+def apply_distinct(query: Select[Tuple[ModelT]], distinct: InstrumentedAttribute[Any] | None) -> Select[Tuple[ModelT]]:
     """
     Apply a distinct clause to a query.
     With SQLite, the distinct clause is applied using the group_by method, while with
@@ -78,9 +76,7 @@ class CRUDBase(
         super().__init__()
         self.model = model
 
-    async def read(
-        self, db: AsyncSession, id: Any, for_update: bool = False
-    ) -> ModelT | None:
+    async def read(self, db: AsyncSession, id: Any, for_update: bool = False) -> ModelT | None:
         """
         Get a record by id.
 
@@ -123,9 +119,7 @@ class CRUDBase(
         query = select(self.model)
 
         for column, value in filters.items():
-            if isinstance(
-                value, dict
-            ):  # Check whether the value of the filter is a dictionary
+            if isinstance(value, dict):  # Check whether the value of the filter is a dictionary
                 for (
                     operator,
                     operand,

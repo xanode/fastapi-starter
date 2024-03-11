@@ -18,9 +18,7 @@ logger = logging.getLogger("app.api.account")
 @router.get(
     "/",
     response_model=list[account_schema.Account],
-    dependencies=[
-        Security(get_current_active_account, scopes=[SecurityScopes.ADMINISTRATOR.value])
-    ],
+    dependencies=[Security(get_current_active_account, scopes=[SecurityScopes.ADMINISTRATOR.value])],
 )
 async def read_accounts(
     db=Depends(get_db),
@@ -57,9 +55,7 @@ async def create_account(account: account_schema.AccountCreate, db=Depends(get_d
 @router.get(
     "/{account_id}",
     response_model=account_schema.Account,
-    dependencies=[
-        Security(get_current_active_account, scopes=[SecurityScopes.ADMINISTRATOR.value])
-    ],
+    dependencies=[Security(get_current_active_account, scopes=[SecurityScopes.ADMINISTRATOR.value])],
 )
 async def read_account(account_id: int, db=Depends(get_db)):
     """
@@ -70,22 +66,16 @@ async def read_account(account_id: int, db=Depends(get_db)):
     account = await accounts.read(db, account_id)
     if account is None:
         logger.debug(f"Account {account_id} not found")
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail=translator.ELEMENT_NOT_FOUND
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=translator.ELEMENT_NOT_FOUND)
     return account
 
 
 @router.put(
     "/{account_id}",
     response_model=account_schema.Account,
-    dependencies=[
-        Security(get_current_active_account, scopes=[SecurityScopes.ADMINISTRATOR.value])
-    ],
+    dependencies=[Security(get_current_active_account, scopes=[SecurityScopes.ADMINISTRATOR.value])],
 )
-async def update_account(
-    account_id: int, account: account_schema.AccountUpdate, db=Depends(get_db)
-):
+async def update_account(account_id: int, account: account_schema.AccountUpdate, db=Depends(get_db)):
     """
     Update an account by ID.
 
@@ -94,9 +84,7 @@ async def update_account(
     old_account = await accounts.read(db, account_id)
     if old_account is None:
         logger.debug(f"Account {account_id} not found")
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail=translator.ELEMENT_NOT_FOUND
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=translator.ELEMENT_NOT_FOUND)
     results = await accounts.query(db, username=account.username)
     if results and results[0].id != old_account.id:
         logger.debug(f"Username {account.username} already exists")
@@ -110,9 +98,7 @@ async def update_account(
 @router.delete(
     "/{account_id}",
     response_model=account_schema.Account,
-    dependencies=[
-        Security(get_current_active_account, scopes=[SecurityScopes.ADMINISTRATOR.value])
-    ],
+    dependencies=[Security(get_current_active_account, scopes=[SecurityScopes.ADMINISTRATOR.value])],
 )
 async def delete_account(account_id: int, db=Depends(get_db)):
     """
@@ -123,7 +109,5 @@ async def delete_account(account_id: int, db=Depends(get_db)):
     account = await accounts.read(db, account_id)
     if account is None:
         logger.debug(f"Account {account_id} not found")
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail=translator.ELEMENT_NOT_FOUND
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=translator.ELEMENT_NOT_FOUND)
     return await accounts.delete(db, id=account_id)

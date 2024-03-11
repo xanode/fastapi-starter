@@ -15,9 +15,7 @@ from app.db.databases.database_interface import DatabaseInterface
 
 
 class SqliteDatabase(DatabaseInterface):
-    def setup(
-        self, path: str = settings.DATABASE_URI
-    ) -> async_sessionmaker[AsyncSession]:
+    def setup(self, path: str = settings.DATABASE_URI) -> async_sessionmaker[AsyncSession]:
         """
         Create a new SQLAlchemy engine and sessionmaker.
         """
@@ -25,9 +23,7 @@ class SqliteDatabase(DatabaseInterface):
             raise ValueError("Use migrations in production")
 
         self.async_engine: AsyncEngine = create_async_engine(path)
-        self.async_sessionmaker = async_sessionmaker(
-            self.async_engine, class_=AsyncSession, expire_on_commit=False
-        )
+        self.async_sessionmaker = async_sessionmaker(self.async_engine, class_=AsyncSession, expire_on_commit=False)
         return self.async_sessionmaker
 
     async def drop(self, path: str = settings.DATABASE_URI) -> None:

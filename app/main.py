@@ -1,4 +1,4 @@
-""" Main module of the API."""
+"""Main module of the API."""
 
 import logging
 from contextlib import asynccontextmanager
@@ -9,8 +9,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.routing import APIRoute
 
-from app.api.utils.endpoints import base_router
 from app.api.api import api_router
+from app.api.utils.endpoints import base_router
 from app.core.config import settings
 from app.core.middleware import ExceptionMonitorMiddleware
 from app.core.utils.backend.alert_backend import alert_backend

@@ -46,9 +46,7 @@ async def get_current_account(
 
     try:
         # Decode the JWT token to get the payload
-        payload = jwt.decode(
-            token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
-        )
+        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
         # Get the id from the payload
         id: str | None = payload.get("sub")
         if id is None:
@@ -92,7 +90,7 @@ async def get_current_account(
 
 
 async def get_current_active_account(
-    current_account: Account = Security(get_current_account, scopes=["user"])
+    current_account: Account = Security(get_current_account, scopes=["user"]),
 ) -> Account:
     """
     Get the current active account associated with the JWT token in the authorization header.

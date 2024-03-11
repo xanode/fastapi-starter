@@ -35,13 +35,9 @@ def validate_password(password: str | None, info: FieldValidationInfo) -> str | 
 
     values = info.data
     # Validate password strength using zxcvbn
-    password_strength = zxcvbn(
-        password, user_inputs=list(values.values()) if values else None
-    )
+    password_strength = zxcvbn(password, user_inputs=list(values.values()) if values else None)
     if password_strength["score"] < 4:
-        raise ValueError(
-            f"Password is too weak: {password_strength['feedback']['warning']}"
-        )
+        raise ValueError(f"Password is too weak: {password_strength['feedback']['warning']}")
     return get_password_hash(password)
 
 

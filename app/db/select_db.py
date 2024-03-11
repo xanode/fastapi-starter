@@ -5,7 +5,7 @@ from app.db.databases.postgres import PostgresDatabase
 from app.db.databases.sqlite import SqliteDatabase
 
 
-@lru_cache()
+@lru_cache
 def select_db(
     env: SupportedEnvironments = settings.ENVIRONMENT,
     db_uri: str = settings.DATABASE_URI,

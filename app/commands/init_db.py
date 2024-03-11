@@ -26,14 +26,10 @@ async def init_db() -> None:
         )
         logger.info("Base account created")
         # Activate account
-        db_obj: Account | None = await accounts.read(
-            db=session, id=1
-        )  # First account to be created
+        db_obj: Account | None = await accounts.read(db=session, id=1)  # First account to be created
         assert db_obj is not None
 
-        updated_account = account_schema.AccountUpdate(
-            **account_schema.Account.model_validate(db_obj).model_dump()
-        )
+        updated_account = account_schema.AccountUpdate(**account_schema.Account.model_validate(db_obj).model_dump())
         updated_account.is_active = True
         updated_account.scope = SecurityScopes.ADMINISTRATOR
         await accounts.update(

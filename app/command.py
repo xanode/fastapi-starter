@@ -114,9 +114,7 @@ execute_parser.add_argument(
     help="SQL command",
 )
 
-PROMPT_MESSAGE = (
-    "Are you sure you want to reset the database, this will delete all data? [y/N] "
-)
+PROMPT_MESSAGE = "Are you sure you want to reset the database, this will delete all data? [y/N] "
 
 
 async def main(command: str) -> None:

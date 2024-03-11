@@ -17,12 +17,7 @@ class Translator:
 
         def __str__(self) -> str:
             """Return the string corresponding to the current locale."""
-            return (
-                self._strings[settings.LOCALE]
-                .format()
-                .replace("_", " ")
-                .capitalize()
-            )
+            return self._strings[settings.LOCALE].format().replace("_", " ").capitalize()
 
     def __init__(self, element: str | None = None):
         super().__init__()
@@ -73,9 +68,7 @@ class Translator:
         {"en": "Insufficient permissions", "fr": "Permissions insuffisantes"}
     )
 
-    INACTIVE_ACCOUNT: TranslatedString = TranslatedString(
-        {"en": "Account is inactive", "fr": "Le compte est inactif"}
-    )
+    INACTIVE_ACCOUNT: TranslatedString = TranslatedString({"en": "Account is inactive", "fr": "Le compte est inactif"})
 
     USERNAME_UNAVAILABLE: TranslatedString = TranslatedString(
         {"en": "Username is unavailable", "fr": "Le nom d'utilisateur est indisponible"}
