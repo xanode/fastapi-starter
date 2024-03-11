@@ -10,6 +10,7 @@ This project is a starter template for a FastAPI project.
 - [x] **Pydantic v2**: Data validation and settings management using Python type annotations.
 - [x] **Pytest**: Testing framework for Python code. 100% test coverage has been set up.
 - [x] **Poetry**: Poetry is a tool for dependency management and packaging in Python.
+- [x] **Ruff**: Ruff is used for the QA of the code.
 - [ ] **Docker**: Docker for containerization.
 - [ ] **Github Actions**: CI/CD with Github Actions.
 - [ ] **Gitlab CI**: CI/CD with Gitlab CI.
@@ -47,7 +48,9 @@ class Client(Base):
   subscription_year: Mapped[int]
   email: Mapped[Str256]
 ```
+
 Notice that:
+
 - The `Base` class is the base class for all the models. It is located in `app/db/base_class.py`. This class is very useful because it apply some default settings to all the models (table name, id, etc).
 - Types of the fields are defined using the `sqlalchemy.orm.Mapped` type to represent an attribute on a mapped class. This allow type checkers to works so that ORM-mapped attributes are correctly types.
 
@@ -85,7 +88,9 @@ class Client(ClientBase):
   """The model linked to the database and used in the API."""
   id: int
 ```
+
 Notice that:
+
 - All classes inherit from the `ClientBase` class to avoid code duplication.
 - The `ClientCreate` class is used to validate the data when creating a new client. It is used in the `POST` requests.
 - The `ClientUpdate` class is used to validate the data when updating a client. It is used in the `PUT` requests.
@@ -104,6 +109,7 @@ class CRUDClient(CRUDBase[Client, ClientCreate, ClientUpdate]):
 
 client = CRUDClient(Client)
 ```
+
 Notice that the `CRUDClient` class is a generic class that is used to create a CRUD service for the `Client` model. It is located in `app/crud/base.py`. This class is very useful because it apply some default settings to all the CRUD services (create, read, update, delete, etc) and in almost all cases, you don't need to modify it so it makes creating a CRUD service very straightforward.
 
 5. You can now create a controller for the model. In order to do that, let's create a new file `app/api/endpoints/client.py`:
@@ -223,7 +229,9 @@ async def delete_client(client_id: int, db=Depends(get_db)):
       )
   return await clients.delete(db, id=client_id)
 ```
+
 Notice that:
+
 - The `translator` object is used to translate the error messages.
 - The `logger` object is used to log the errors or whaterever you want.
 - The `Security` object is used to check if the user is authenticated. You can also check if the user has the right to do the action by adding the `scopes` parameter to the `Security` object (`scopes` are defined in `app/core/types.py` among others).
@@ -231,7 +239,6 @@ Notice that:
 6. Your done! You can now test your API by running `uvicorn app.main:app --reload` and going to `http://127.0.0.1:8080/docs` in your browser.
 
 7. Don't forget to add tests!
-
 
 ## Projects using this template
 
