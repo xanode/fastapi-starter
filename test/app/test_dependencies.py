@@ -130,7 +130,7 @@ class TestGetCurrentAccount(BaseTest):
 
         with self.assertRaises(HTTPException) as error:
             await get_current_active_account(
-                current_account=self.account_db,
+                user_account=self.account_db,
             )
 
         assert error.exception.status_code == status.HTTP_400_BAD_REQUEST
@@ -142,7 +142,7 @@ class TestGetCurrentAccount(BaseTest):
 
         # Arrange
         current_account = await get_current_active_account(
-            current_account=self.account_db,
+            user_account=self.account_db,
         )
 
         # Assert

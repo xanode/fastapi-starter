@@ -1,9 +1,11 @@
+from typing import Annotated
+
 from pydantic import (
+    AfterValidator,
     ConfigDict,
     Field,
-    FieldValidationInfo,
+    ValidationInfo,
     computed_field,
-    field_validator,
 )
 from zxcvbn import zxcvbn
 
@@ -12,7 +14,7 @@ from app.core.types import SecurityScopes
 from app.schemas.base import DefaultModel, ExcludedField
 
 
-def validate_password(password: str | None, info: FieldValidationInfo) -> str | None:
+def validate_password(password: str | None, info: ValidationInfo) -> str | None:
     """Validate password strength and hash it.
 
     Args:
@@ -41,13 +43,14 @@ def validate_password(password: str | None, info: FieldValidationInfo) -> str | 
     return get_password_hash(password)
 
 
+Password = Annotated[str, AfterValidator(validate_password)]
+
+
 class AccountBase(DefaultModel):
     username: str = Field(..., min_length=3, max_length=32)
     last_name: str
     first_name: str
-    password: str
-
-    _validate_password = field_validator("password", mode="after")(validate_password)
+    password: Password
 
 
 class AccountCreate(AccountBase):
@@ -66,7 +69,7 @@ class AccountUpdate(AccountBase):
     username: str | None = Field(default=None, min_length=3, max_length=32)
     last_name: str | None = None
     first_name: str | None = None
-    password: str | None = None
+    password: Password | None = None
     scope: SecurityScopes | None = None
     is_active: bool | None = None
 
@@ -78,7 +81,7 @@ class OwnAccountUpdate(AccountBase):
     username: str | None = Field(default=None, min_length=3, max_length=32)
     last_name: str | None = None
     first_name: str | None = None
-    password: str | None = None
+    password: Password | None = None
 
     model_config = ConfigDict(extra="forbid")
 
@@ -91,7 +94,7 @@ class Account(AccountBase):
     """
 
     id: int
-    password: str | None = ExcludedField
+    password: Password | None = ExcludedField
     scope: SecurityScopes
     is_active: bool
 
