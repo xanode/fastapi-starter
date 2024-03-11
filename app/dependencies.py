@@ -1,13 +1,14 @@
 import logging
+from typing import Annotated
 
-from fastapi import Depends, HTTPException, Security, status
-from fastapi.security import SecurityScopes
+from fastapi import Depends, HTTPException, Security, security, status
 from jose import JWTError, jwt
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.auth import check_scopes, oauth2_scheme
 from app.core.config import settings
 from app.core.translation import Translator
+from app.core.types import SecurityScopes
 from app.crud.crud_account import account as accounts
 from app.db.select_db import select_db
 from app.models.account import Account
@@ -20,10 +21,12 @@ logger = logging.getLogger("app.dependencies")
 # Create a database session (dependency injected)
 get_db = select_db()
 
+DBDependency = Annotated[AsyncSession, Depends(get_db)]
+
 
 async def get_current_account(
-    security_scopes: SecurityScopes,
-    db: AsyncSession = Depends(get_db),
+    security_scopes: security.SecurityScopes,
+    db: DBDependency,
     token: str = Depends(oauth2_scheme),
 ) -> Account:
     """
@@ -89,8 +92,13 @@ async def get_current_account(
     return account
 
 
+AdminAccountDependency = Annotated[Account, Security(get_current_account, scopes=[SecurityScopes.ADMINISTRATOR.value])]
+ModeratorAccountDependency = Annotated[Account, Security(get_current_account, scopes=[SecurityScopes.MODERATOR.value])]
+UserAccountDependency = Annotated[Account, Security(get_current_account, scopes=[SecurityScopes.USER.value])]
+
+
 async def get_current_active_account(
-    current_account: Account = Security(get_current_account, scopes=["user"]),
+    user_account: UserAccountDependency,
 ) -> Account:
     """
     Get the current active account associated with the JWT token in the authorization header.
@@ -99,10 +107,13 @@ async def get_current_active_account(
 
     :return: The account associated with the JWT token if the token is valid and the account is active
     """
-    if current_account.is_active is False:
+    if user_account.is_active is False:
         logger.debug("Account is inactive")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=translator.INACTIVE_ACCOUNT,
         )
-    return current_account
+    return user_account
+
+
+CurrentAccountDependency = Annotated[Account, Security(get_current_active_account)]
