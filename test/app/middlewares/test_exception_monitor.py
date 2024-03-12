@@ -4,7 +4,7 @@ import pytest
 from fastapi import FastAPI, status
 from fastapi.testclient import TestClient
 
-from app.core.middleware import ExceptionMonitorMiddleware
+from app.middlewares.exception_monitor import ExceptionMonitorMiddleware
 
 side_effect_queue: asyncio.Queue[dict] = asyncio.Queue()
 

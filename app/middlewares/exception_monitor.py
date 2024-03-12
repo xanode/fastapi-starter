@@ -11,7 +11,7 @@ from app.core.utils.backend.alert_backend import Alert
 
 translator = Translator()
 
-logger = logging.getLogger("app.core.middleware")
+logger = logging.getLogger("app.middleware.exception_middleware")
 
 
 class ExceptionMonitorMiddleware(BaseHTTPMiddleware):
