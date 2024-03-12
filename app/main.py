@@ -12,7 +12,7 @@ from fastapi.routing import APIRoute
 from app.api.api import api_router
 from app.api.utils.endpoints import base_router
 from app.core.config import settings
-from app.core.middleware import ExceptionMonitorMiddleware
+from app.middlewares.exception_monitor import ExceptionMonitorMiddleware
 from app.core.utils.backend.alert_backend import alert_backend
 from app.db.pre_start import pre_start
 from app.dependencies import get_db
