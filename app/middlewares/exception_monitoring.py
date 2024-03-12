@@ -11,10 +11,10 @@ from app.core.utils.backend.alert_backend import Alert
 
 translator = Translator()
 
-logger = logging.getLogger("app.middleware.exception_middleware")
+logger = logging.getLogger("app.middleware.exception_monitoring")
 
 
-class ExceptionMonitorMiddleware(BaseHTTPMiddleware):
+class ExceptionMonitoringMiddleware(BaseHTTPMiddleware):
     """
     This middleware is used to monitor and handle exceptions that occur during
     the processing of an HTTP request. It allows an alert backend function to be

@@ -12,7 +12,7 @@ from fastapi.routing import APIRoute
 from app.api.api import api_router
 from app.api.utils.endpoints import base_router
 from app.core.config import settings
-from app.middlewares.exception_monitor import ExceptionMonitorMiddleware
+from app.middlewares.exception_monitoring import ExceptionMonitoringMiddleware
 from app.core.utils.backend.alert_backend import alert_backend
 from app.db.pre_start import pre_start
 from app.dependencies import get_db
@@ -79,7 +79,7 @@ app = FastAPI(
     generate_unique_id_function=custom_generate_unique_id,
 )
 
-app.add_middleware(ExceptionMonitorMiddleware, alert_backend=alert_backend())
+app.add_middleware(ExceptionMonitoringMiddleware, alert_backend=alert_backend())
 app.add_middleware(TrustedHostMiddleware, allowed_hosts=settings.ALLOWED_HOSTS)
 app.add_middleware(
     CORSMiddleware,
