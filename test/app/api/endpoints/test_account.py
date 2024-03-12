@@ -18,9 +18,7 @@ class TestAccount(BaseTest):
         )
 
         async with get_db.get_session() as session:
-            self.account_db = Account.model_validate(
-                await crud_account.create(session, obj_in=self.account_create)
-            )
+            self.account_db = Account.model_validate(await crud_account.create(session, obj_in=self.account_create))
 
     async def read_account_from_db(self, id: int):
         async with get_db.get_session() as session:
@@ -72,9 +70,7 @@ class TestAccount(BaseTest):
             password=settings.BASE_ACCOUNT_PASSWORD,
         )
         # Act
-        response = self._client.post(
-            "/api/account/", json=new_account_create.model_dump(by_alias=True)
-        )
+        response = self._client.post("/api/account/", json=new_account_create.model_dump(by_alias=True))
 
         account_in_db = await self.read_account_from_db(response.json().get("id"))
 
@@ -94,9 +90,7 @@ class TestAccount(BaseTest):
             password=settings.BASE_ACCOUNT_PASSWORD,
         )
         # Act
-        response = self._client.post(
-            "/api/account/", json=new_account_create.model_dump(by_alias=True)
-        )
+        response = self._client.post("/api/account/", json=new_account_create.model_dump(by_alias=True))
 
         # Assert
         assert response.status_code == 400
@@ -123,9 +117,7 @@ class TestAccount(BaseTest):
         # Arrange
         account_update = AccountUpdate(last_name="changed")
         # Act
-        response = self._client.put(
-            "/api/account/0", json=account_update.model_dump(by_alias=True)
-        )
+        response = self._client.put("/api/account/0", json=account_update.model_dump(by_alias=True))
 
         # Assert
         assert response.status_code == 404
@@ -141,9 +133,7 @@ class TestAccount(BaseTest):
             password=settings.BASE_ACCOUNT_PASSWORD,
         )
         async with get_db.get_session() as session:
-            new_account = Account.model_validate(
-                await crud_account.create(session, obj_in=new_account_create)
-            )
+            new_account = Account.model_validate(await crud_account.create(session, obj_in=new_account_create))
 
         account_update = AccountUpdate(username=new_account.username)
         # Act

@@ -18,9 +18,7 @@ logger = logging.getLogger("app.db.pre_start")
 # the function with retry
 def handle_sigint(signum, frame):
     if RAISED_EXCEPTION:  # pragma: no cover
-        traceback.print_exception(
-            type(RAISED_EXCEPTION), RAISED_EXCEPTION, RAISED_EXCEPTION.__traceback__
-        )
+        traceback.print_exception(type(RAISED_EXCEPTION), RAISED_EXCEPTION, RAISED_EXCEPTION.__traceback__)
     sys.exit(0)
 
 

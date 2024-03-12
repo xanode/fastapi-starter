@@ -18,21 +18,13 @@ logger = logging.getLogger("app.api.auth")
 
 
 @router.post("/login/", response_model=token_schema.Token)
-async def login(
-    form_data: OAuth2PasswordRequestForm = Depends(), db=Depends(get_db)
-) -> Any:
+async def login(form_data: OAuth2PasswordRequestForm = Depends(), db=Depends(get_db)) -> Any:
     """
     Logs in a user and returns an access token.
     """
-    account = (
-        (await accounts.query(db, username=form_data.username, limit=1))[0:1] or [None]
-    )[0]
+    account = ((await accounts.query(db, username=form_data.username, limit=1))[0:1] or [None])[0]
     # Check if account exists, if password is correct and if account is active
-    if (
-        account is None
-        or not verify_password(form_data.password, account.password)
-        or account.is_active is False
-    ):
+    if account is None or not verify_password(form_data.password, account.password) or account.is_active is False:
         if account is None:
             logger.debug(f"Account {form_data.username} not found")
         elif not verify_password(form_data.password, account.password):
@@ -44,11 +36,7 @@ async def login(
             detail=translator.INVALID_CREDENTIALS,
             headers={"WWW-Authenticate": "Bearer"},
         )
-    return {
-        "access_token": create_access_token(
-            subject=account.id, scopes=[account.scope.value]
-        )
-    }
+    return {"access_token": create_access_token(subject=account.id, scopes=[account.scope.value])}
 
 
 @router.get("/me/", response_model=account_schema.Account)
@@ -78,5 +66,4 @@ async def update_account_me(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail=translator.USERNAME_UNAVAILABLE,
             )
-    account = await accounts.update(db, db_obj=current_account, obj_in=account_in)  # type: ignore
-    return account
+    return await accounts.update(db, db_obj=current_account, obj_in=account_in)  # type: ignore

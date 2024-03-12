@@ -16,10 +16,7 @@ class TestException(Exception):
 
 
 class Alert(Protocol):  # pragma: no cover
-    def __call__(
-        self, exception: Exception, method: str, url: URL, headers: Headers, body: bytes
-    ) -> None:
-        ...
+    def __call__(self, exception: Exception, method: str, url: URL, headers: Headers, body: bytes) -> None: ...
 
 
 def alert_backend() -> Alert:
@@ -34,13 +31,9 @@ def alert_backend() -> Alert:
     return alert_to_terminal
 
 
-def alert_to_terminal(
-    exception: Exception, method: str, url: URL, headers: Headers, body: bytes
-) -> None:
-    if (
-        isinstance(exception, TestException) and settings.ENVIRONMENT == "production"
-    ):  # pragma: no cover
-        return None
+def alert_to_terminal(exception: Exception, method: str, url: URL, headers: Headers, body: bytes) -> None:
+    if isinstance(exception, TestException) and settings.ENVIRONMENT == "production":  # pragma: no cover
+        return
 
     logger.error("### An exception has been raised! ###")
     logger.error("############## Request ##############")
@@ -55,9 +48,7 @@ def alert_to_terminal(
     print_exception(type(exception), exception, exception.__traceback__, chain=False)
 
 
-def alert_to_github_issues(
-    exception: Exception, method: str, url: URL, headers: Headers, body: bytes
-) -> None:
+def alert_to_github_issues(exception: Exception, method: str, url: URL, headers: Headers, body: bytes) -> None:
     if isinstance(exception, TestException):  # pragma: no cover
         return None
 
@@ -66,11 +57,7 @@ def alert_to_github_issues(
     markdown = f"# {issue_name}\n\n"
     markdown += f"{method} {url}\n\n"
     markdown += "## Request headers\n"
-    markdown += "\n".join(
-        f"- **{key}**: {value}"
-        for key, value in headers.items()
-        if key != "Authorization"
-    )
+    markdown += "\n".join(f"- **{key}**: {value}" for key, value in headers.items() if key != "Authorization")
     markdown += "\n\n"
     markdown += "## Request body\n"
     markdown += "```\n"
@@ -78,11 +65,7 @@ def alert_to_github_issues(
     markdown += "\n```\n\n"
     markdown += "## Exception traceback\n"
     markdown += "```\n"
-    markdown += "".join(
-        format_exception(
-            type(exception), exception, exception.__traceback__, chain=False
-        )
-    )
+    markdown += "".join(format_exception(type(exception), exception, exception.__traceback__, chain=False))
     markdown += "\n```\n\n"
 
     # Create the issue on github

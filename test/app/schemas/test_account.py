@@ -1,4 +1,3 @@
-from datetime import datetime
 from unittest.mock import MagicMock
 
 import pytest
@@ -29,7 +28,7 @@ def test_validate_password():
     except ValueError as e:
         assert "Password is too weak" in str(e)
     else:
-        assert False, "Expected ValueError"
+        raise AssertionError("Expected ValueError")
 
 
 def test_validate_password_with_hashed_password():
@@ -71,7 +70,7 @@ def test_account_create():
         assert "Password is too weak" in str(e)
         assert "value_error" in str(e)
     else:
-        assert False, "Expected ValidationError"
+        raise AssertionError("Expected ValidationError")
 
 
 def test_account_update():

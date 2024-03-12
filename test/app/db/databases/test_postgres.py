@@ -1,12 +1,11 @@
 from unittest import IsolatedAsyncioTestCase
 from unittest.mock import AsyncMock, call, patch
 
-from sqlalchemy import URL, text
+from sqlalchemy import URL
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
 from app.db.databases.postgres import PostgresDatabase
-from unittest.mock import AsyncMock
 
 postgres_url = URL.create(
     drivername="postgresql+asyncpg",
