@@ -1,117 +1,39 @@
 import logging
-from copy import deepcopy
-from datetime import datetime
 from enum import Enum
-from operator import gt, lt
-from typing import Any, Dict, List, Optional, Tuple, Type
+from typing import Any, Dict, List, Type
 
-from pydantic import BaseModel, create_model
-from pydantic.fields import Field, FieldInfo
+from pydantic import ConfigDict
 
-from app.schemas.base import DefaultModel
+from app.schemas.base import ComparaisonDict, ComparaisonModel, DefaultModel, OptionalModel
 
 logger = logging.getLogger("app.core.utils.misc")
 
-ComparaisonSuffix = ["__gt", "__lt"]
-ComparaisonTypes = (
-    int,
-    float,
-    datetime,
-    Optional[int],
-    Optional[float],
-    Optional[datetime],
-)
-
 
 def to_query_parameters(
-    model: Type[DefaultModel],
+    model: type[DefaultModel],
     comparaison: bool = False,
     exclude: list[str] | None = None,
-) -> type[BaseModel]:
-    """Function that creates a new Pydantic model with all the fields of the original model,
-    but with all fields optional.
-    This is useful for creating query parameters that can be used to filter database queries.
-
-    Args:
-        model (Type[DefaultModel]): The base model to use.
-        comparison (bool, optional): Whether to add comparison fields (key__gt, key__lt, etc.). Defaults to False.
-        exclude (list[str], optional): The fields to exclude from the new model. Defaults to ["id", "password"].
-
-    Returns:
-        type[BaseModel]: The new Pydantic model.
-    """
+) -> type[DefaultModel]:
     if exclude is None:
         exclude = []
 
     exclude.extend(["id", "password"])
 
-    # Create a dictionary of fields with their type and metadata
-    fields: dict[str, Tuple[type[Any] | None, FieldInfo]] = {}
-    # List of fields that have been extended with comparison fields
-    fields_extended_with_comparison: list[str] = []
+    # Create a new class which inherit from the model and the ComparaisonModel
+    NewModel: type[DefaultModel] = type(
+        f"Query{model.__name__}",
+        (model, ComparaisonModel if comparaison else OptionalModel),
+        {},
+    )
 
-    # Iterate over the fields of the model and add them to the fields dictionary
-    for key, value in model.model_fields.items():
-        if key in exclude:
-            continue
+    for key in exclude:
+        if key in NewModel.model_fields:
+            del NewModel.model_fields[key]
 
-        if value.exclude:
-            continue
+    NewModel.model_config = ConfigDict(alias_generator=lambda x: x, populate_by_name=True)
+    NewModel.model_rebuild(force=True)
 
-        _type = value.annotation
-        field: FieldInfo = Field(default=None, alias=key, alias_priority=1, validate_default=None)
-
-        field.metadata = value.metadata
-        field.rebuild_annotation()
-
-        if _type in ComparaisonTypes and comparaison is True:
-            for suffix in ComparaisonSuffix:
-                field_copy = deepcopy(field)
-                field_copy.alias = f"{key}{suffix}"
-                fields[f"{key}{suffix}"] = (_type | None, field_copy)  # type: ignore
-                fields_extended_with_comparison.append(key)
-
-        fields[key] = (_type | None, field)  # type: ignore
-
-    new_model: type[BaseModel] = create_model(f"{model.__name__}Query", **fields)  # type: ignore
-
-    # This logic is used to copy the validators from the original model to the new model
-    # This is needed because the validators are not copied by create_model
-    # We iterate over the validators of the original model and add them to the new model if
-    # the fields of the validator are in the fields of the new model + the comparison fields
-    for (
-        validator_name,
-        validator,
-    ) in model.__pydantic_decorators__.field_validators.items():
-        # We get which fields the validator is applied to
-        validator_fields = validator.info.fields
-
-        # If any of the validator_fields is not in the fields of the model, skip it
-        if any(_field not in fields for _field in validator_fields):
-            continue
-
-        # If we match a key which could has been extended with comparison fields, we need to add
-        # the comparison fields to the new model validators fields
-        _fields_to_adds: tuple[str, ...] = ()
-        for _field in validator_fields:
-            if _field in fields_extended_with_comparison:
-                _fields_to_adds += tuple(f"{_field}{suffix}" for suffix in ComparaisonSuffix)
-
-        # We add the comparison fields to the validator
-        validator.info.fields += _fields_to_adds
-
-        # We add the validator to the new model
-        new_model.__pydantic_decorators__.field_validators[validator_name] = validator
-
-    # We copy the metadata, annotations and parent namespace of the original model to the new model
-    # new_model.__pydantic_generic_metadata__ = model.__pydantic_generic_metadata__
-    # new_model.__annotations__ = model.__annotations__
-    new_model.__pydantic_parent_namespace__ = model.__pydantic_parent_namespace__
-
-    # We rebuild the model to add the new fields
-    new_model.model_rebuild(force=True)
-
-    return new_model
+    return NewModel
 
 
 def process_query_parameters(query_model: DefaultModel) -> dict[str, Any]:
@@ -138,14 +60,10 @@ def process_query_parameters(query_model: DefaultModel) -> dict[str, Any]:
             if key not in processed_query_parameters:
                 processed_query_parameters[key] = {}
 
-            match operator:
-                case "gt":
-                    processed_query_parameters[key][gt] = value
-                case "lt":
-                    processed_query_parameters[key][lt] = value
-                # Add default case
-                case _:  # pragma: no cover
-                    logger.warning(f"Unknown operator {operator} for key {key}")
+            if operator in ComparaisonDict:
+                processed_query_parameters[key][ComparaisonDict[operator]] = value
+            else:
+                logger.warning(f"Unknown operator {operator} for key {key}")
         else:
             processed_query_parameters[key] = value
     return processed_query_parameters

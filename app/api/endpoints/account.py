@@ -6,7 +6,7 @@ from app.core.translation import Translator
 from app.core.types import SecurityScopes
 from app.core.utils.misc import process_query_parameters, to_query_parameters
 from app.crud.crud_account import account as accounts
-from app.dependencies import get_current_active_account, get_db
+from app.dependencies import DBDependency, get_current_active_account
 from app.schemas import account as account_schema
 
 router = APIRouter(tags=["account"], prefix="/account")
@@ -21,7 +21,7 @@ logger = logging.getLogger("app.api.account")
     dependencies=[Security(get_current_active_account, scopes=[SecurityScopes.ADMINISTRATOR.value])],
 )
 async def read_accounts(
-    db=Depends(get_db),
+    db: DBDependency,
     query=Depends(to_query_parameters(account_schema.Account)),
 ):
     """
@@ -39,7 +39,7 @@ async def read_accounts(
 
 
 @router.post("/", response_model=account_schema.Account)
-async def create_account(account: account_schema.AccountCreate, db=Depends(get_db)):
+async def create_account(account: account_schema.AccountCreate, db: DBDependency):
     """
     Create a new account.
     """
@@ -57,7 +57,7 @@ async def create_account(account: account_schema.AccountCreate, db=Depends(get_d
     response_model=account_schema.Account,
     dependencies=[Security(get_current_active_account, scopes=[SecurityScopes.ADMINISTRATOR.value])],
 )
-async def read_account(account_id: int, db=Depends(get_db)):
+async def read_account(account_id: int, db: DBDependency):
     """
     Retrieve an account by ID.
 
@@ -75,7 +75,7 @@ async def read_account(account_id: int, db=Depends(get_db)):
     response_model=account_schema.Account,
     dependencies=[Security(get_current_active_account, scopes=[SecurityScopes.ADMINISTRATOR.value])],
 )
-async def update_account(account_id: int, account: account_schema.AccountUpdate, db=Depends(get_db)):
+async def update_account(account_id: int, account: account_schema.AccountUpdate, db: DBDependency):
     """
     Update an account by ID.
 
@@ -100,7 +100,7 @@ async def update_account(account_id: int, account: account_schema.AccountUpdate,
     response_model=account_schema.Account,
     dependencies=[Security(get_current_active_account, scopes=[SecurityScopes.ADMINISTRATOR.value])],
 )
-async def delete_account(account_id: int, db=Depends(get_db)):
+async def delete_account(account_id: int, db: DBDependency):
     """
     Delete an account by ID.
 

@@ -1,13 +1,13 @@
 import logging
-from typing import Any
+from typing import Annotated, Any
 
-from fastapi import APIRouter, Depends, HTTPException, Security, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 
 from app.core.security import create_access_token, verify_password
 from app.core.translation import Translator
 from app.crud.crud_account import account as accounts
-from app.dependencies import get_current_active_account, get_db
+from app.dependencies import CurrentAccountDependency, DBDependency
 from app.schemas import account as account_schema
 from app.schemas import token as token_schema
 
@@ -16,9 +16,11 @@ translator = Translator()
 
 logger = logging.getLogger("app.api.auth")
 
+AuthFormData = Annotated[OAuth2PasswordRequestForm, Depends()]
+
 
 @router.post("/login/", response_model=token_schema.Token)
-async def login(form_data: OAuth2PasswordRequestForm = Depends(), db=Depends(get_db)) -> Any:
+async def login(form_data: AuthFormData, db: DBDependency) -> Any:
     """
     Logs in a user and returns an access token.
     """
@@ -41,7 +43,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends(), db=Depends(get
 
 @router.get("/me/", response_model=account_schema.Account)
 async def read_account_me(
-    current_account: account_schema.Account = Security(get_current_active_account),
+    current_account: CurrentAccountDependency,
 ) -> Any:
     """
     Returns the current user's account information.
@@ -52,8 +54,8 @@ async def read_account_me(
 @router.put("/me/", response_model=account_schema.Account)
 async def update_account_me(
     account_in: account_schema.OwnAccountUpdate,
-    current_account: account_schema.Account = Security(get_current_active_account),
-    db=Depends(get_db),
+    current_account: CurrentAccountDependency,
+    db: DBDependency,
 ) -> Any:
     """
     Updates the current user's account information.
