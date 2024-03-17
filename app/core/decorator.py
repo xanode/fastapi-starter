@@ -4,13 +4,12 @@ from typing import Tuple, Type
 
 from fastapi import HTTPException, status
 
-from app.core.translation import Translator
 
 logger = logging.getLogger("app.core.decorator")
 
 
 def handle_exceptions(
-    detail: str | Translator.TranslatedString,
+    detail: str,
     exceptions: Tuple[Type[Exception], ...] | Type[Exception],
     sync_func: bool = False,
 ):
