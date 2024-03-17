@@ -7,14 +7,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.auth import check_scopes, oauth2_scheme
 from app.core.config import settings
-from app.core.translation import Translator
 from app.core.types import SecurityScopes
 from app.crud.crud_account import account as accounts
 from app.db.select_db import select_db
 from app.models.account import Account
 from app.schemas import token as token_schema
 
-translator = Translator()
 logger = logging.getLogger("app.dependencies")
 
 
@@ -43,7 +41,7 @@ async def get_current_account(
     # Create an exception to be raised if the token is invalid (i.e. invalid credentials)
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
-        detail=translator.AUTHENTICATION_REQUIRED,
+        detail=_("AUTHENTICATION_REQUIRED"),
         headers={"WWW-Authenticate": "Bearer"},
     )
 
@@ -85,7 +83,7 @@ async def get_current_account(
         # Raise an exception if the token does not have the required scope
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=translator.INSUFFICIENT_PERMISSIONS,
+            detail=_("INSUFFICIENT_PERMISSIONS"),
             headers={"WWW-Authenticate": authenticate_value},
         )
     # Return the account
@@ -111,7 +109,7 @@ async def get_current_active_account(
         logger.debug("Account is inactive")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=translator.INACTIVE_ACCOUNT,
+            detail=_("INACTIVE_ACCOUNT"),
         )
     return user_account
 
