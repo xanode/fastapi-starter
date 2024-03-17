@@ -1,0 +1,33 @@
+#: api/endpoints/account.py:48 api/endpoints/account.py:91
+#: api/endpoints/auth.py:67
+msgid "UNAVAILABLE_USERNAME"
+msgstr "Unavailable username"
+
+#: api/endpoints/account.py:67 api/endpoints/account.py:85
+#: api/endpoints/account.py:110
+msgid "ELEMENT_NOT_FOUND"
+msgstr "Element not found"
+
+#: api/endpoints/auth.py:36
+msgid "INVALID_CREDENTIALS"
+msgstr "Invalid credentials"
+
+#: crud/base.py:140 crud/base.py:165 crud/base.py:207
+msgid "INTEGRITY_ERROR"
+msgstr "Data relationship integrity error"
+
+#: dependencies.py:44
+msgid "AUTHENTICATION_REQUIRED"
+msgstr "Authentication required"
+
+#: dependencies.py:86
+msgid "INSUFFICIENT_PERMISSIONS"
+msgstr "Insufficient permissions"
+
+#: dependencies.py:112
+msgid "INACTIVE_ACCOUNT"
+msgstr "Inactive account"
+
+#: middlewares/exception_monitoring.py:65
+msgid "INTERNAL_SERVER_ERROR"
+msgstr "Internal server error"
