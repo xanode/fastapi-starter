@@ -6,10 +6,8 @@ from fastapi.responses import Response
 from starlette.background import BackgroundTask
 from starlette.middleware.base import BaseHTTPMiddleware
 
-from app.core.translation import Translator
 from app.core.utils.backend.alert_backend import Alert
 
-translator = Translator()
 
 logger = logging.getLogger("app.middleware.exception_monitoring")
 
@@ -64,7 +62,7 @@ class ExceptionMonitoringMiddleware(BaseHTTPMiddleware):
             )
             # Return a default error response with the background task
             return Response(
-                content=translator.INTERNAL_SERVER_ERROR,
+                content=_("INTERNAL_SERVER_ERROR"),
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 background=task,
             )
