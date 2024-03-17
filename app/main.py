@@ -1,5 +1,6 @@
 """Main module of the API."""
 
+import gettext
 import logging
 from contextlib import asynccontextmanager
 from typing import Any, Dict
@@ -13,6 +14,7 @@ from app.api.api import api_router
 from app.api.utils.endpoints import base_router
 from app.core.config import settings
 from app.middlewares.exception_monitoring import ExceptionMonitoringMiddleware
+from app.middlewares.i18n import I18nMiddleware
 from app.core.utils.backend.alert_backend import alert_backend
 from app.db.pre_start import pre_start
 from app.dependencies import get_db
@@ -20,6 +22,9 @@ from app.schemas.base import HTTPError
 from app.utils.custom_openapi import generate_custom_openapi
 from app.utils.get_version import get_version
 from app.utils.logger import setup_logs
+
+
+gettext.install("app", localedir="app/locales")
 
 setup_logs("app", level=logging.DEBUG)
 setup_logs("uvicorn.access")
@@ -79,7 +84,8 @@ app = FastAPI(
     generate_unique_id_function=custom_generate_unique_id,
 )
 
-app.add_middleware(ExceptionMonitoringMiddleware, alert_backend=alert_backend())
+app.add_middleware(ExceptionMonitoringMiddleware, alert_backend=alert_backend()) # Should be the first middleware to catch all exceptions
+app.add_middleware(I18nMiddleware)
 app.add_middleware(TrustedHostMiddleware, allowed_hosts=settings.ALLOWED_HOSTS)
 app.add_middleware(
     CORSMiddleware,
