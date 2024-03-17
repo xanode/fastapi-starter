@@ -5,14 +5,12 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 
 from app.core.security import create_access_token, verify_password
-from app.core.translation import Translator
 from app.crud.crud_account import account as accounts
 from app.dependencies import CurrentAccountDependency, DBDependency
 from app.schemas import account as account_schema
 from app.schemas import token as token_schema
 
 router = APIRouter(tags=["auth"], prefix="/auth")
-translator = Translator()
 
 logger = logging.getLogger("app.api.auth")
 
@@ -35,7 +33,7 @@ async def login(form_data: AuthFormData, db: DBDependency) -> Any:
             logger.debug(f"Account {form_data.username} is not active")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=translator.INVALID_CREDENTIALS,
+            detail=_("INVALID_CREDENTIALS"),
             headers={"WWW-Authenticate": "Bearer"},
         )
     return {"access_token": create_access_token(subject=account.id, scopes=[account.scope.value])}
@@ -66,6 +64,6 @@ async def update_account_me(
             logger.debug(f"Username {account_in.username} already exists")
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail=translator.USERNAME_UNAVAILABLE,
+                detail=_("UNAVAILABLE_USERNAME"),
             )
     return await accounts.update(db, db_obj=current_account, obj_in=account_in)  # type: ignore
