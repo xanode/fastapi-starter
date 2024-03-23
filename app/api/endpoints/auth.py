@@ -6,7 +6,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 
 from app.core.security import create_access_token, verify_password
 from app.crud.crud_account import account as accounts
-from app.dependencies import CurrentAccountDependency, DBDependency
+from app.dependencies import CurrentAccountDependency, DBDependency, TranslationDependency
 from app.schemas import account as account_schema
 from app.schemas import token as token_schema
 
@@ -18,7 +18,7 @@ AuthFormData = Annotated[OAuth2PasswordRequestForm, Depends()]
 
 
 @router.post("/login/", response_model=token_schema.Token)
-async def login(form_data: AuthFormData, db: DBDependency) -> Any:
+async def login(form_data: AuthFormData, db: DBDependency, _: TranslationDependency) -> Any:
     """
     Logs in a user and returns an access token.
     """
@@ -54,6 +54,7 @@ async def update_account_me(
     account_in: account_schema.OwnAccountUpdate,
     current_account: CurrentAccountDependency,
     db: DBDependency,
+    _: TranslationDependency,
 ) -> Any:
     """
     Updates the current user's account information.

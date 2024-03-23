@@ -20,8 +20,8 @@ class ExceptionMonitoringMiddleware(BaseHTTPMiddleware):
     notifications or log the exception for further analysis.
 
     The middleware also returns a response a status code of 500 (Internal
-    Server Error) and a default error message to the client, while running the alert
-    backend function in the background as a `BackgroundTask`.
+    Server Error), while running the alert backend function in the background
+    as a `BackgroundTask`.
     """
 
     def __init__(self, app, alert_backend: Alert):
@@ -62,7 +62,6 @@ class ExceptionMonitoringMiddleware(BaseHTTPMiddleware):
             )
             # Return a default error response with the background task
             return Response(
-                content=_("INTERNAL_SERVER_ERROR"),
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 background=task,
             )

@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException, Security, status
 from app.core.types import SecurityScopes
 from app.core.utils.misc import process_query_parameters, to_query_parameters
 from app.crud.crud_account import account as accounts
-from app.dependencies import DBDependency, get_current_active_account
+from app.dependencies import DBDependency, get_current_active_account, TranslationDependency
 from app.schemas import account as account_schema
 
 router = APIRouter(tags=["account"], prefix="/account")
@@ -37,7 +37,7 @@ async def read_accounts(
 
 
 @router.post("/", response_model=account_schema.Account)
-async def create_account(account: account_schema.AccountCreate, db: DBDependency):
+async def create_account(account: account_schema.AccountCreate, db: DBDependency, _: TranslationDependency):
     """
     Create a new account.
     """
@@ -55,7 +55,7 @@ async def create_account(account: account_schema.AccountCreate, db: DBDependency
     response_model=account_schema.Account,
     dependencies=[Security(get_current_active_account, scopes=[SecurityScopes.ADMINISTRATOR.value])],
 )
-async def read_account(account_id: int, db: DBDependency):
+async def read_account(account_id: int, db: DBDependency, _: TranslationDependency):
     """
     Retrieve an account by ID.
 
@@ -73,7 +73,7 @@ async def read_account(account_id: int, db: DBDependency):
     response_model=account_schema.Account,
     dependencies=[Security(get_current_active_account, scopes=[SecurityScopes.ADMINISTRATOR.value])],
 )
-async def update_account(account_id: int, account: account_schema.AccountUpdate, db: DBDependency):
+async def update_account(account_id: int, account: account_schema.AccountUpdate, db: DBDependency, _: TranslationDependency):
     """
     Update an account by ID.
 
@@ -98,7 +98,7 @@ async def update_account(account_id: int, account: account_schema.AccountUpdate,
     response_model=account_schema.Account,
     dependencies=[Security(get_current_active_account, scopes=[SecurityScopes.ADMINISTRATOR.value])],
 )
-async def delete_account(account_id: int, db: DBDependency):
+async def delete_account(account_id: int, db: DBDependency, _: TranslationDependency):
     """
     Delete an account by ID.
 
