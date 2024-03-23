@@ -1,6 +1,5 @@
 """Main module of the API."""
 
-import gettext
 import logging
 from contextlib import asynccontextmanager
 from typing import Any, Dict
@@ -9,10 +8,12 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.routing import APIRoute
+from sqlalchemy.exc import IntegrityError
 
 from app.api.api import api_router
 from app.api.utils.endpoints import base_router
 from app.core.config import settings
+from app.core.exception_handlers import integrity_error_handler
 from app.middlewares.exception_monitoring import ExceptionMonitoringMiddleware
 from app.middlewares.i18n import I18nMiddleware
 from app.core.utils.backend.alert_backend import alert_backend
@@ -23,8 +24,6 @@ from app.utils.custom_openapi import generate_custom_openapi
 from app.utils.get_version import get_version
 from app.utils.logger import setup_logs
 
-
-gettext.install("app", localedir="app/locales")
 
 setup_logs("app", level=logging.DEBUG)
 setup_logs("uvicorn.access")
@@ -95,6 +94,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.add_exception_handler(IntegrityError, integrity_error_handler)
 
 app.include_router(base_router, prefix=settings.API_PREFIX)
 app.include_router(api_router, prefix=settings.API_PREFIX)

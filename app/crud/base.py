@@ -1,12 +1,10 @@
 from datetime import datetime, timezone
 from typing import Any, Generic, Sequence, Tuple, Type, TypeVar
 
-from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import InstrumentedAttribute
 from sqlalchemy.sql.expression import Select, select
 
-from app.core.decorator import handle_exceptions
 from app.db.base_class import Base
 from app.db.databases.sqlite import SqliteDatabase
 from app.db.select_db import select_db
@@ -137,7 +135,6 @@ class CRUDBase(
         objs = await db.execute(query.offset(skip).limit(limit))
         return [patch_timezone_sqlite(obj) for obj in objs.scalars().all()]
 
-    @handle_exceptions(_("INTEGRITY_ERROR"), IntegrityError)
     async def create(self, db: AsyncSession, *, obj_in: CreateSchemaT) -> ModelT:
         """
         Create a new record.
@@ -162,7 +159,6 @@ class CRUDBase(
         # Return the created model instance
         return patch_timezone_sqlite(db_obj)
 
-    @handle_exceptions(_("INTEGRITY_ERROR"), IntegrityError)
     async def update(
         self,
         db: AsyncSession,
@@ -204,7 +200,6 @@ class CRUDBase(
         await db.refresh(db_obj)
         return patch_timezone_sqlite(db_obj)
 
-    @handle_exceptions(_("INTEGRITY_ERROR"), IntegrityError)
     async def delete(self, db: AsyncSession, *, id: int) -> ModelT | None:
         """
         Delete a record.
