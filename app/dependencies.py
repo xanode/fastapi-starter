@@ -1,5 +1,5 @@
 import logging
-from typing import Annotated
+from typing import Annotated, Callable
 
 from fastapi import Depends, HTTPException, Security, security, status
 from jose import JWTError, jwt
@@ -10,6 +10,7 @@ from app.core.config import settings
 from app.core.types import SecurityScopes
 from app.crud.crud_account import account as accounts
 from app.db.select_db import select_db
+from app.i18n import get_translation
 from app.models.account import Account
 from app.schemas import token as token_schema
 
@@ -20,11 +21,13 @@ logger = logging.getLogger("app.dependencies")
 get_db = select_db()
 
 DBDependency = Annotated[AsyncSession, Depends(get_db)]
+TranslationDependency = Annotated[Callable[[str], str], Depends(get_translation)]
 
 
 async def get_current_account(
     security_scopes: security.SecurityScopes,
     db: DBDependency,
+    _: TranslationDependency,
     token: str = Depends(oauth2_scheme),
 ) -> Account:
     """
@@ -97,6 +100,7 @@ UserAccountDependency = Annotated[Account, Security(get_current_account, scopes=
 
 async def get_current_active_account(
     user_account: UserAccountDependency,
+    _: TranslationDependency,
 ) -> Account:
     """
     Get the current active account associated with the JWT token in the authorization header.
@@ -112,6 +116,5 @@ async def get_current_active_account(
             detail=_("INACTIVE_ACCOUNT"),
         )
     return user_account
-
 
 CurrentAccountDependency = Annotated[Account, Security(get_current_active_account)]

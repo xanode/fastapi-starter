@@ -1,3 +1,4 @@
+import gettext
 import logging
 
 from fastapi import Request
@@ -21,7 +22,8 @@ class I18nMiddleware(BaseHTTPMiddleware):
         :param app: The FastAPI app to which the middleware is being added.
         """
         super().__init__(app)
-        self.language: str | None = None
+        self.current_locale: str | None = None
+        self.translation: gettext.GNUTranslations | None = None
 
     async def dispatch(self, request: Request, call_next):
         """
@@ -32,15 +34,19 @@ class I18nMiddleware(BaseHTTPMiddleware):
         :param call_next: The next middleware in the chain.
         :return: The response from the next middleware in the chain.
         """
-        accept_language = request.headers.get("Accept-Language")
+        locale: str | None = request.headers.get("Accept-Language")
+        locale = settings.DEFAULT_LOCALE if not locale else locale
+
+        if locale != self.current_locale:
+            logger.debug(f"Setting locale to {locale}")
+            self.current_locale = locale
+            try:
+                self.translation = gettext.translation('base', localedir=settings.LOCALE_DIR, languages=[locale])
+            except FileNotFoundError:
+                logger.debug(f"Locale {locale} not found, setting to default")
+                self.translation = gettext.translation('base', localedir=settings.LOCALE_DIR, languages=[settings.DEFAULT_LOCALE])
+
+        request.state.translation = self.translation
         
-        if self.language is None:
-            if accept_language is None:
-                self.language = settings.LOCALE
-            else:
-                logger.debug(f"Accept-Language: {accept_language}")
-                self.language = accept_language.split(",")[0].strip().split(";")[0]
-        
-        request.state.language = self.language
         response = await call_next(request)
         return response
