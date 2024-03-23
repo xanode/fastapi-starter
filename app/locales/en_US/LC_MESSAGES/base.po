@@ -1,3 +1,11 @@
+# English (US) translations for the API
+#
+msgid ""
+msgstr ""
+"Language: en_US\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+
+
 #: api/endpoints/account.py:48 api/endpoints/account.py:91
 #: api/endpoints/auth.py:67
 msgid "UNAVAILABLE_USERNAME"
