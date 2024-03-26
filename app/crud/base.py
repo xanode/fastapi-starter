@@ -1,6 +1,7 @@
 from datetime import datetime, timezone
 from typing import Any, Generic, Sequence, Tuple, Type, TypeVar
 
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import InstrumentedAttribute
 from sqlalchemy.sql.expression import Select, select
@@ -150,10 +151,17 @@ class CRUDBase(
         obj_in_data = obj_in.model_dump()
         # Create a new model instance from the input data
         db_obj = self.model(**obj_in_data)
-        # Add the new model instance to the database session
-        db.add(db_obj)
-        # Commit the session to persist the model instance in the database
-        await db.commit()
+        try:
+            # Add the new model instance to the database session
+            db.add(db_obj)
+            # Commit the session to persist the model instance in the database
+            await db.commit()
+        except IntegrityError as e:
+            # If an IntegrityError exception is raised, it means that the record violates a constraint
+            # (e.g. a unique constraint) and the transaction is rolled back
+            await db.rollback()
+            # The exception is raised to be handled by the exception handler
+            raise e.orig
         # Refresh the model instance to get the default values for the columns
         await db.refresh(db_obj)
         # Return the created model instance
@@ -195,8 +203,12 @@ class CRUDBase(
                 # i.e. set the value of the field of the database object to the value of the field in the update data
                 setattr(db_obj, field, update_data[field])
 
-        db.add(db_obj)
-        await db.commit()
+        try:
+            db.add(db_obj)
+            await db.commit()
+        except IntegrityError as e:
+            await db.rollback()
+            raise e.orig
         await db.refresh(db_obj)
         return patch_timezone_sqlite(db_obj)
 
@@ -210,6 +222,10 @@ class CRUDBase(
         :return: The deleted record
         """
         obj = await db.get(self.model, id)
-        await db.delete(obj)
-        await db.commit()
+        try:
+            await db.delete(obj)
+            await db.commit()
+        except IntegrityError as e:
+            await db.rollback()
+            raise e.orig
         return obj
