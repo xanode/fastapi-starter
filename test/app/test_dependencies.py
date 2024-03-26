@@ -1,3 +1,5 @@
+import gettext
+
 from test.base_test import BaseTest
 
 from fastapi import HTTPException, status
@@ -9,6 +11,9 @@ from app.core.security import create_access_token
 from app.crud.crud_account import account as crud_account
 from app.dependencies import get_current_account, get_current_active_account, get_db
 from app.schemas.account import Account, AccountCreate
+
+
+_ = gettext.translation('base', localedir=settings.LOCALE_DIR, languages=[settings.DEFAULT_LOCALE]).gettext
 
 
 class TestGetCurrentAccount(BaseTest):
@@ -41,6 +46,7 @@ class TestGetCurrentAccount(BaseTest):
                 security_scopes=self.security_scopes,
                 token=modified_token,
                 db=get_db.get_session(),
+                _=_,
             )
 
         # Assert
@@ -57,6 +63,7 @@ class TestGetCurrentAccount(BaseTest):
                 security_scopes=self.security_scopes,
                 token=modified_token,
                 db=get_db.get_session(),
+                _=_,
             )
 
         assert error.exception.status_code == status.HTTP_401_UNAUTHORIZED
@@ -72,6 +79,7 @@ class TestGetCurrentAccount(BaseTest):
                 security_scopes=self.security_scopes,
                 token=self.token,
                 db=get_db.get_session(),
+                _=_,
             )
 
         assert error.exception.status_code == status.HTTP_401_UNAUTHORIZED
@@ -86,6 +94,7 @@ class TestGetCurrentAccount(BaseTest):
                 security_scopes=self.security_scopes,
                 token=modified_token,
                 db=get_db.get_session(),
+                _=_,
             )
 
         assert error.exception.status_code == status.HTTP_401_UNAUTHORIZED
@@ -100,6 +109,7 @@ class TestGetCurrentAccount(BaseTest):
                 security_scopes=modified_scopes,
                 token=self.token,
                 db=get_db.get_session(),
+                _=_,
             )
 
         assert error.exception.status_code == status.HTTP_401_UNAUTHORIZED
@@ -111,6 +121,7 @@ class TestGetCurrentAccount(BaseTest):
             security_scopes=self.security_scopes,
             token=self.token,
             db=get_db.get_session(),
+            _=_,
         )
 
         # Assert
@@ -131,6 +142,7 @@ class TestGetCurrentAccount(BaseTest):
         with self.assertRaises(HTTPException) as error:
             await get_current_active_account(
                 user_account=self.account_db,
+                _=_,
             )
 
         assert error.exception.status_code == status.HTTP_400_BAD_REQUEST
@@ -143,6 +155,7 @@ class TestGetCurrentAccount(BaseTest):
         # Arrange
         current_account = await get_current_active_account(
             user_account=self.account_db,
+            _=_,
         )
 
         # Assert

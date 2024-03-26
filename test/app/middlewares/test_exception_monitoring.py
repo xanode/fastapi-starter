@@ -44,8 +44,8 @@ async def test_exception_monitoring_middleware():
     # Assert that the response has a status code of 500
     assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
 
-    # Assert that the response content is the default error message
-    assert response.content == b"Internal server error"
+    # Assert that the response content is empty
+    assert response.content == b""
 
     # Wait for the alert backend function to be called
     side_effect_data = await side_effect_queue.get()
