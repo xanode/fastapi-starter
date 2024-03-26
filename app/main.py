@@ -11,7 +11,7 @@ from fastapi.routing import APIRoute
 from sqlalchemy.exc import IntegrityError
 
 from app.api.api import api_router
-from app.api.utils.endpoints import base_router
+from app.api.utils.endpoints import utils_router
 from app.core.config import settings
 from app.core.exception_handlers import integrity_error_handler
 from app.middlewares.exception_monitoring import ExceptionMonitoringMiddleware
@@ -96,7 +96,7 @@ app.add_middleware(
 
 app.add_exception_handler(IntegrityError, integrity_error_handler)
 
-app.include_router(base_router, prefix=settings.API_PREFIX)
+app.include_router(utils_router, prefix=settings.API_PREFIX)
 app.include_router(api_router, prefix=settings.API_PREFIX)
 
 app.openapi = generate_custom_openapi(app)
