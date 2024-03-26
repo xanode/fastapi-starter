@@ -22,7 +22,7 @@ msgstr "Invalid credentials"
 
 #: crud/base.py:140 crud/base.py:165 crud/base.py:207
 msgid "INTEGRITY_ERROR"
-msgstr "Data relationship integrity error"
+msgstr "Relational integrity error"
 
 #: dependencies.py:44
 msgid "AUTHENTICATION_REQUIRED"
