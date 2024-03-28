@@ -5,7 +5,27 @@ from fastapi.testclient import TestClient
 from unittest.mock import patch
 
 from app.core.config import settings, SupportedLocales
-from app.middlewares.i18n import I18nMiddleware
+from app.middlewares.i18n import I18nMiddleware, parse_accept_language_header
+
+
+def test_parse_accept_language_header():
+    # Test with a single language
+    assert parse_accept_language_header("en") == "en-US"
+    assert parse_accept_language_header("fr") == "fr-FR"
+
+    # Test with multiple languages
+    assert parse_accept_language_header("en, fr") == "en-US"
+
+    # Test with multiple languages and weights
+    assert parse_accept_language_header("en;q=0.8, fr;q=0.9") == "fr-FR"
+    assert parse_accept_language_header("en-US;q=0.9, fr;q=0.8") == "en-US"
+    assert parse_accept_language_header("fr,fr-FR;q=0.8,en-US;q=0.5,en;q=0.3") == "fr-FR"
+
+    # Test with multiple languages, weights, and unsupported languages
+    assert parse_accept_language_header("en;q=0.8, fr;q=0.9, unsupported") == "fr-FR"
+
+    # Test with unsupported languages
+    assert parse_accept_language_header("unsupported") == "en-US"
 
 
 @pytest.mark.asyncio
