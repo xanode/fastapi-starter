@@ -24,7 +24,7 @@ class I18nMiddleware(BaseHTTPMiddleware):
         super().__init__(app)
         self.current_locale: str | None = None
         self.translation: gettext.GNUTranslations | None = None
-
+    
     async def dispatch(self, request: Request, call_next):
         """
         Dispatch the given request through the middleware chain.
@@ -35,7 +35,7 @@ class I18nMiddleware(BaseHTTPMiddleware):
         :return: The response from the next middleware in the chain.
         """
         locale: str | None = request.headers.get("Accept-Language")
-        locale = settings.DEFAULT_LOCALE if not locale else locale
+        locale = settings.DEFAULT_LOCALE if not locale or locale not in settings.SUPPORTED_LOCALES else locale
 
         if locale != self.current_locale:
             logger.debug(f"Setting locale to {locale}")
@@ -43,7 +43,7 @@ class I18nMiddleware(BaseHTTPMiddleware):
             try:
                 self.translation = gettext.translation('base', localedir=settings.LOCALE_DIR, languages=[locale])
             except FileNotFoundError:
-                logger.debug(f"Locale {locale} not found, setting to default")
+                logger.warning(f"Locale {locale} not found, but should be supported. Setting to default")
                 self.translation = gettext.translation('base', localedir=settings.LOCALE_DIR, languages=[settings.DEFAULT_LOCALE])
 
         request.state.translation = self.translation
