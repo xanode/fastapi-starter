@@ -66,7 +66,6 @@ class TestAccount(BaseTest):
             username="testuser2",
             last_name="test",
             first_name="user",
-            promotion_year=2021,
             password=settings.BASE_ACCOUNT_PASSWORD,
         )
         # Act
@@ -86,7 +85,6 @@ class TestAccount(BaseTest):
             username="testuser",
             last_name="test",
             first_name="user",
-            promotion_year=2021,
             password=settings.BASE_ACCOUNT_PASSWORD,
         )
         # Act
@@ -94,7 +92,7 @@ class TestAccount(BaseTest):
 
         # Assert
         assert response.status_code == 400
-        assert response.json() == {"detail": "Username is unavailable"}
+        assert response.json() == {"detail": "Unavailable username"}
 
     async def test_update_account(self):
         # Arrange
@@ -129,7 +127,6 @@ class TestAccount(BaseTest):
             username="testuser2",
             last_name="test",
             first_name="user",
-            promotion_year=2021,
             password=settings.BASE_ACCOUNT_PASSWORD,
         )
         async with get_db.get_session() as session:
@@ -144,7 +141,7 @@ class TestAccount(BaseTest):
 
         # Assert
         assert response.status_code == 400
-        assert response.json() == {"detail": "Username is unavailable"}
+        assert response.json() == {"detail": "Unavailable username"}
 
     async def test_delete_account(self):
         # Arrange

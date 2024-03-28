@@ -176,5 +176,5 @@ class TestAccount(BaseTest):
 
         # Assert
         assert response.status_code == 400
-        assert response.json() == {"detail": "Username is unavailable"}
+        assert response.json() == {"detail": "Unavailable username"}
         assert "Username testuser2 already exists" in self._caplog.text

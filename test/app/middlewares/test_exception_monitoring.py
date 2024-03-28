@@ -4,7 +4,7 @@ import pytest
 from fastapi import FastAPI, status
 from fastapi.testclient import TestClient
 
-from app.core.middleware import ExceptionMonitorMiddleware
+from app.middlewares.exception_monitoring import ExceptionMonitoringMiddleware
 
 side_effect_queue: asyncio.Queue[dict] = asyncio.Queue()
 
@@ -14,10 +14,10 @@ def alert_backend(*args, **kwargs):
 
 
 @pytest.mark.asyncio
-async def test_exception_monitor_middleware():
+async def test_exception_monitoring_middleware():
     # Define a FastAPI app with the middleware
     app = FastAPI()
-    app.add_middleware(ExceptionMonitorMiddleware, alert_backend=alert_backend)
+    app.add_middleware(ExceptionMonitoringMiddleware, alert_backend=alert_backend)
 
     # Define a test client for the app
     client = TestClient(app)
@@ -44,8 +44,8 @@ async def test_exception_monitor_middleware():
     # Assert that the response has a status code of 500
     assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
 
-    # Assert that the response content is the default error message
-    assert response.content == b"Internal server error"
+    # Assert that the response content is empty
+    assert response.content == b""
 
     # Wait for the alert backend function to be called
     side_effect_data = await side_effect_queue.get()

@@ -8,6 +8,7 @@ from fastapi.datastructures import URL, Headers
 
 from app.core.config import settings
 
+
 logger = logging.getLogger("app.core.utils.backend.alert_backend")
 
 

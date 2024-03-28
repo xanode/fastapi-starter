@@ -1,13 +1,13 @@
 from fastapi import APIRouter
 
-from app.core.utils.backend.alert_backend import TestException
 from app.schemas.utils_endpoints import HealthResponse, RootResponse, VersionResponse
 from app.utils.get_version import get_version
 
-base_router = APIRouter(tags=["Utils"])
+
+utils_router = APIRouter(tags=["utils"])
 
 
-@base_router.get("/", status_code=200, response_model=RootResponse)
+@utils_router.get("/", status_code=200, response_model=RootResponse)
 async def root():
     """
     Root endpoint.
@@ -15,7 +15,7 @@ async def root():
     return {"msg": "Hello, World!"}
 
 
-@base_router.get("/health", status_code=200, response_model=HealthResponse)
+@utils_router.get("/health", status_code=200, response_model=HealthResponse)
 async def health():
     """
     Health endpoint.
@@ -23,15 +23,7 @@ async def health():
     return {"status": "Ok"}
 
 
-@base_router.get("/error", status_code=500)
-async def error():
-    """
-    Error endpoint, which need to be used to test the exception monitor middleware.
-    """
-    raise TestException("Test exception")
-
-
-@base_router.get("/version", status_code=200, response_model=VersionResponse)
+@utils_router.get("/version", status_code=200, response_model=VersionResponse)
 async def version():
     """
     Version endpoint.

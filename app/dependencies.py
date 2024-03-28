@@ -1,5 +1,5 @@
 import logging
-from typing import Annotated
+from typing import Annotated, Callable
 
 from fastapi import Depends, HTTPException, Security, security, status
 from jose import JWTError, jwt
@@ -7,14 +7,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.auth import check_scopes, oauth2_scheme
 from app.core.config import settings
-from app.core.translation import Translator
 from app.core.types import SecurityScopes
 from app.crud.crud_account import account as accounts
 from app.db.select_db import select_db
+from app.i18n import get_translation
 from app.models.account import Account
 from app.schemas import token as token_schema
 
-translator = Translator()
 logger = logging.getLogger("app.dependencies")
 
 
@@ -22,11 +21,13 @@ logger = logging.getLogger("app.dependencies")
 get_db = select_db()
 
 DBDependency = Annotated[AsyncSession, Depends(get_db)]
+TranslationDependency = Annotated[Callable[[str], str], Depends(get_translation)]
 
 
 async def get_current_account(
     security_scopes: security.SecurityScopes,
     db: DBDependency,
+    _: TranslationDependency,
     token: str = Depends(oauth2_scheme),
 ) -> Account:
     """
@@ -43,7 +44,7 @@ async def get_current_account(
     # Create an exception to be raised if the token is invalid (i.e. invalid credentials)
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
-        detail=translator.AUTHENTICATION_REQUIRED,
+        detail=_("AUTHENTICATION_REQUIRED"),
         headers={"WWW-Authenticate": "Bearer"},
     )
 
@@ -85,7 +86,7 @@ async def get_current_account(
         # Raise an exception if the token does not have the required scope
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=translator.INSUFFICIENT_PERMISSIONS,
+            detail=_("INSUFFICIENT_PERMISSIONS"),
             headers={"WWW-Authenticate": authenticate_value},
         )
     # Return the account
@@ -99,6 +100,7 @@ UserAccountDependency = Annotated[Account, Security(get_current_account, scopes=
 
 async def get_current_active_account(
     user_account: UserAccountDependency,
+    _: TranslationDependency,
 ) -> Account:
     """
     Get the current active account associated with the JWT token in the authorization header.
@@ -111,9 +113,8 @@ async def get_current_active_account(
         logger.debug("Account is inactive")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=translator.INACTIVE_ACCOUNT,
+            detail=_("INACTIVE_ACCOUNT"),
         )
     return user_account
-
 
 CurrentAccountDependency = Annotated[Account, Security(get_current_active_account)]

@@ -2,6 +2,7 @@ __pycache__
 .venv
 **/*.db
 **/*_deprecated*
+**/*.mo
 .env
 coverage.xml
 .coverage

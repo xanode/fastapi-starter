@@ -6,15 +6,13 @@ from fastapi.responses import Response
 from starlette.background import BackgroundTask
 from starlette.middleware.base import BaseHTTPMiddleware
 
-from app.core.translation import Translator
 from app.core.utils.backend.alert_backend import Alert
 
-translator = Translator()
 
-logger = logging.getLogger("app.core.middleware")
+logger = logging.getLogger("app.middleware.exception_monitoring")
 
 
-class ExceptionMonitorMiddleware(BaseHTTPMiddleware):
+class ExceptionMonitoringMiddleware(BaseHTTPMiddleware):
     """
     This middleware is used to monitor and handle exceptions that occur during
     the processing of an HTTP request. It allows an alert backend function to be
@@ -22,8 +20,8 @@ class ExceptionMonitorMiddleware(BaseHTTPMiddleware):
     notifications or log the exception for further analysis.
 
     The middleware also returns a response a status code of 500 (Internal
-    Server Error) and a default error message to the client, while running the alert
-    backend function in the background as a `BackgroundTask`.
+    Server Error), while running the alert backend function in the background
+    as a `BackgroundTask`.
     """
 
     def __init__(self, app, alert_backend: Alert):
@@ -64,7 +62,6 @@ class ExceptionMonitorMiddleware(BaseHTTPMiddleware):
             )
             # Return a default error response with the background task
             return Response(
-                content=translator.INTERNAL_SERVER_ERROR,
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 background=task,
             )

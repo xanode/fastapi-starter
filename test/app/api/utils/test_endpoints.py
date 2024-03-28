@@ -13,12 +13,6 @@ def test_health(client: TestClient):
     assert response.json() == {"status": "Ok"}
 
 
-def test_error(client: TestClient):
-    response = client.get("/api/error")
-    assert response.status_code == 500
-    assert response.text == "Internal server error"
-
-
 def test_version(client: TestClient):
     response = client.get("/api/version")
     assert response.status_code == 200

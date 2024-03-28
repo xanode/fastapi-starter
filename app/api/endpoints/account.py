@@ -2,15 +2,13 @@ import logging
 
 from fastapi import APIRouter, Depends, HTTPException, Security, status
 
-from app.core.translation import Translator
 from app.core.types import SecurityScopes
 from app.core.utils.misc import process_query_parameters, to_query_parameters
 from app.crud.crud_account import account as accounts
-from app.dependencies import DBDependency, get_current_active_account
+from app.dependencies import DBDependency, get_current_active_account, TranslationDependency
 from app.schemas import account as account_schema
 
 router = APIRouter(tags=["account"], prefix="/account")
-translator = Translator()
 
 logger = logging.getLogger("app.api.account")
 
@@ -39,7 +37,7 @@ async def read_accounts(
 
 
 @router.post("/", response_model=account_schema.Account)
-async def create_account(account: account_schema.AccountCreate, db: DBDependency):
+async def create_account(account: account_schema.AccountCreate, db: DBDependency, _: TranslationDependency):
     """
     Create a new account.
     """
@@ -47,7 +45,7 @@ async def create_account(account: account_schema.AccountCreate, db: DBDependency
         logger.debug(f"Username {account.username} already exists")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=translator.USERNAME_UNAVAILABLE,
+            detail=_("UNAVAILABLE_USERNAME"),
         )
     return await accounts.create(db, obj_in=account)
 
@@ -57,7 +55,7 @@ async def create_account(account: account_schema.AccountCreate, db: DBDependency
     response_model=account_schema.Account,
     dependencies=[Security(get_current_active_account, scopes=[SecurityScopes.ADMINISTRATOR.value])],
 )
-async def read_account(account_id: int, db: DBDependency):
+async def read_account(account_id: int, db: DBDependency, _: TranslationDependency):
     """
     Retrieve an account by ID.
 
@@ -66,7 +64,7 @@ async def read_account(account_id: int, db: DBDependency):
     account = await accounts.read(db, account_id)
     if account is None:
         logger.debug(f"Account {account_id} not found")
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=translator.ELEMENT_NOT_FOUND)
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=_("ELEMENT_NOT_FOUND"))
     return account
 
 
@@ -75,7 +73,7 @@ async def read_account(account_id: int, db: DBDependency):
     response_model=account_schema.Account,
     dependencies=[Security(get_current_active_account, scopes=[SecurityScopes.ADMINISTRATOR.value])],
 )
-async def update_account(account_id: int, account: account_schema.AccountUpdate, db: DBDependency):
+async def update_account(account_id: int, account: account_schema.AccountUpdate, db: DBDependency, _: TranslationDependency):
     """
     Update an account by ID.
 
@@ -84,13 +82,13 @@ async def update_account(account_id: int, account: account_schema.AccountUpdate,
     old_account = await accounts.read(db, account_id)
     if old_account is None:
         logger.debug(f"Account {account_id} not found")
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=translator.ELEMENT_NOT_FOUND)
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=_("ELEMENT_NOT_FOUND"))
     results = await accounts.query(db, username=account.username)
     if results and results[0].id != old_account.id:
         logger.debug(f"Username {account.username} already exists")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=translator.USERNAME_UNAVAILABLE,
+            detail=_("UNAVAILABLE_USERNAME"),
         )
     return await accounts.update(db, db_obj=old_account, obj_in=account)
 
@@ -100,7 +98,7 @@ async def update_account(account_id: int, account: account_schema.AccountUpdate,
     response_model=account_schema.Account,
     dependencies=[Security(get_current_active_account, scopes=[SecurityScopes.ADMINISTRATOR.value])],
 )
-async def delete_account(account_id: int, db: DBDependency):
+async def delete_account(account_id: int, db: DBDependency, _: TranslationDependency):
     """
     Delete an account by ID.
 
@@ -109,5 +107,5 @@ async def delete_account(account_id: int, db: DBDependency):
     account = await accounts.read(db, account_id)
     if account is None:
         logger.debug(f"Account {account_id} not found")
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=translator.ELEMENT_NOT_FOUND)
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=_("ELEMENT_NOT_FOUND"))
     return await accounts.delete(db, id=account_id)

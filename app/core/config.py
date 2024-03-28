@@ -9,7 +9,7 @@ from pydantic_settings import BaseSettings
 
 logger = logging.getLogger("app.core.config")
 
-SupportedLocales = Literal["en", "fr"]
+SupportedLocales = Literal["en-US", "fr-FR"]
 SupportedEnvironments = Literal["development", "production", "test"]
 
 
@@ -71,7 +71,9 @@ class Settings(BaseSettings):
 
     ALERT_BACKEND: str
     API_PREFIX: str = "/api"
-    LOCALE: SupportedLocales
+    LOCALE_DIR: str
+    DEFAULT_LOCALE: str = "en-US"
+    SUPPORTED_LOCALES: list[SupportedLocales] = list(SupportedLocales.__args__)
 
     ALLOWED_HOSTS: list[str]
 
@@ -114,7 +116,7 @@ class Settings(BaseSettings):
 class ConfigDevelopment(Settings):
     ALERT_BACKEND: str = "terminal"
 
-    LOCALE: SupportedLocales = "fr"
+    LOCALE_DIR: str = "app/locales"
 
     ALLOWED_HOSTS: list[str] = ["*"]
 
@@ -167,7 +169,7 @@ class ConfigDevelopment(Settings):
 class ConfigProduction(Settings):
     ALERT_BACKEND: str = "terminal"
 
-    LOCALE: SupportedLocales = "en"
+    LOCALE_DIR: str = "app/locales"
 
     ALLOWED_HOSTS: list[str] = ["*"]  # ! Shouldn't be set to ["*"] in production!
 
@@ -207,7 +209,7 @@ class ConfigProduction(Settings):
 
 class ConfigTest(Settings):
     ALERT_BACKEND: str = "terminal"
-    LOCALE: SupportedLocales = "en"
+    LOCALE_DIR: str = "app/locales"
     ALLOWED_HOSTS: list[str] = ["*"]
 
     LOG_LEVEL: int = logging.DEBUG
