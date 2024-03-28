@@ -9,6 +9,7 @@ from pydantic_settings import BaseSettings
 
 logger = logging.getLogger("app.core.config")
 
+SupportedLocales = Literal["en_US", "fr_FR"]
 SupportedEnvironments = Literal["development", "production", "test"]
 
 
@@ -72,6 +73,7 @@ class Settings(BaseSettings):
     API_PREFIX: str = "/api"
     LOCALE_DIR: str
     DEFAULT_LOCALE: str = "en_US"
+    SUPPORTED_LOCALES: list[SupportedLocales] = list(SupportedLocales.__args__)
 
     ALLOWED_HOSTS: list[str]
 
