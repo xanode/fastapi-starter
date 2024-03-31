@@ -1,7 +1,6 @@
 from datetime import datetime
 from enum import Enum
 from operator import gt, lt
-from typing import Dict, List, Optional
 
 import pytest
 from pydantic import Field, field_validator
@@ -20,7 +19,7 @@ class User(DefaultModel):
     username: str
     email: str = Field(..., pattern=r"^\S+@\S+\.\S+$")
     created_at: datetime
-    updated_at: Optional[datetime] = None
+    updated_at: datetime | None = None
     test_int: int
     test_float: float
 
@@ -32,10 +31,10 @@ class User(DefaultModel):
 
 
 class QueryModelTest(DefaultModel):
-    id__gt: Optional[int]
-    name: Optional[str]
-    created_at__gt: Optional[datetime]
-    amount__lt: Optional[float]
+    id__gt: int | None
+    name: str | None
+    created_at__gt: datetime | None
+    amount__lt: float | None
 
 
 class ExampleEnum(Enum):
@@ -104,7 +103,7 @@ def test_process_query_parameters():
 
 
 def test_create_hierarchy_dict() -> None:
-    expected_result: Dict[str, List[str]] = {
+    expected_result: dict[str, list[str]] = {
         "A": ["A"],
         "B": ["A", "B"],
         "C": ["A", "B", "C"],

@@ -1,7 +1,6 @@
 from datetime import datetime as _datetime
 from operator import gt
 from test.base_test import BaseTest
-from typing import Optional
 from unittest.mock import patch
 
 from app.crud.base import CRUDBase, patch_timezone_sqlite
@@ -24,9 +23,9 @@ class UserCreate(DefaultModel):
 
 
 class UserUpdate(DefaultModel):
-    email: Optional[str] = None
-    password: Optional[str] = None
-    datetime: Optional[_datetime] = None
+    email: str | None = None
+    password: str | None = None
+    datetime: _datetime | None = None
 
 
 class CRUDUser(CRUDBase[ModelUser, UserCreate, UserUpdate]): ...

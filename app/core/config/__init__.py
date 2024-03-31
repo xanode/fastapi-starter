@@ -19,7 +19,7 @@ def select_settings(_env: str | None = os.getenv("ENVIRONMENT")):
     Returns the application settings based on the environment specified.
 
     Args:
-        _env (Optional[str], optional): Environment to get the settings for. Defaults to env.
+        _env (str | None, optional): Environment to get the settings for. Defaults to env.
 
     Raises:
         ValueError: If an invalid environment is specified.
