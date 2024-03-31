@@ -3,12 +3,12 @@ Alembic extension to generate ALTER TYPE .. ADD VALUE statements to update
 SQLAlchemy enums.
 
 Got from https://github.com/dw/alembic-autogenerate-enums
-This is only a copy with some modifications to work with our project.
+This is only a copy with some modifications to work with this project.
 """
 
 from contextlib import contextmanager
 from dataclasses import dataclass
-from typing import Dict, FrozenSet, Generator, List, Optional, Tuple
+from typing import FrozenSet, Generator
 
 import sqlalchemy
 
@@ -29,8 +29,8 @@ class EnumToTable:
 @dataclass
 class DeclaredEnumValues:
     # enum name -> frozenset of values
-    enum_definitions: Dict[str, FrozenSet[str]]
-    table_definitions: Optional[List[EnumToTable]] = None
+    enum_definitions: dict[str, FrozenSet[str]]
+    table_definitions: list[EnumToTable] | None = None
 
 
 def get_defined_enums(conn, schema):
@@ -124,9 +124,9 @@ class SyncEnumValuesOp(alembic.operations.ops.MigrateOperation):
         self,
         schema: str,
         name: str,
-        old_values: List[str],
-        new_values: List[str],
-        affected_columns: List[Tuple[str, str]],
+        old_values: list[str],
+        new_values: list[str],
+        affected_columns: list[tuple[str, str]],
     ):
         self.schema = schema
         self.name = name
@@ -152,9 +152,9 @@ class SyncEnumValuesOp(alembic.operations.ops.MigrateOperation):
         operations,
         schema,
         name,
-        old_values: List[str],
-        new_values: List[str],
-        affected_columns: Optional[List[Tuple[str, str]]] = None,  # (table_name, column_name) tuples
+        old_values: list[str],
+        new_values: list[str],
+        affected_columns: list[tuple[str, str]] | None = None,  # (table_name, column_name) tuples
     ):
         """
         Define every enum value from `new_values` that is not present in

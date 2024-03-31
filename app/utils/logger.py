@@ -2,7 +2,6 @@
 
 import logging
 import sys
-from typing import Optional
 
 from app.core.config import settings
 
@@ -66,15 +65,15 @@ def setup_logs(
 
 def configure_stdout_logging(
     logger: logging.Logger,
-    formatter: Optional[logging.Formatter] = None,
+    formatter: logging.Formatter | None = None,
     log_level: int = logging.DEBUG,
 ):
     """
     Configures the logger to log to stdout with the specified logger, formatter and log level.
 
     Args:
-        logger (Optional[logging.Logger], optional): The logger to configure. Defaults to None.
-        formatter (Optional[logging.Formatter], optional): The formatter to use. Defaults to None.
+        logger (logging.Logger): The logger to configure.
+        formatter (logging.Formatter | None, optional): The formatter to use. Defaults to None.
         log_level (str, optional): The log level to use. Defaults to "DEV".
     """
     stream_handler = logging.StreamHandler(stream=sys.stdout)

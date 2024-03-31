@@ -1,7 +1,7 @@
 from copy import deepcopy
 from datetime import datetime
 from operator import ge, gt, le, lt, ne
-from typing import Any, Optional
+from typing import Any
 
 from humps import camelize
 from pydantic import BaseModel, ConfigDict, Field
@@ -30,7 +30,7 @@ class OptionalModel(DefaultModel):
 
         for field in cls.model_fields.values():
             field.default = None
-            field.annotation = Optional[field.annotation]  # type: ignore
+            field.annotation = field.annotation | None  # type: ignore
 
         cls.model_rebuild(force=True)
 
@@ -46,9 +46,9 @@ ComparaisonTypes = (
     int,
     float,
     datetime,
-    Optional[int],
-    Optional[float],
-    Optional[datetime],
+    int | None,
+    float | None,
+    datetime | None,
 )
 
 
