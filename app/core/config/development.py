@@ -17,27 +17,24 @@ class ConfigDevelopment(Settings):
     LOG_LEVEL: int = logging.DEBUG
     ENVIRONMENT: SupportedEnvironments = "development"
 
-    """ Authentication config"""
+    # Authentication config
     # openssl rand -hex 32
     SECRET_KEY: str = Field(
         default="6a50e3ddeef70fd46da504d8d0a226db7f0b44dcdeb65b97751cf2393b33693e",
     )
 
-    """Base account config """
-
+    # Base account config
     BASE_ACCOUNT_USERNAME: str = "admin"
     BASE_ACCOUNT_PASSWORD: str = "admin-password*45"
 
-    """Database config"""
-
+    # Database config
     POSTGRES_HOST: str = "localhost"
     POSTGRES_PORT: int = 5432
     POSTGRES_DB: str = "fdpsql"
     POSTGRES_USER: str = "ubuntoutou"
     POSTGRES_PASSWORD: str = "totofaitdelamoto"
 
-    """Github config"""
-
+    # Github config
     GITHUB_USER: str = "test_github_user"
     GITHUB_TOKEN: str = "test_github_token"
 

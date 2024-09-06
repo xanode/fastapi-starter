@@ -2,6 +2,7 @@ from abc import abstractmethod
 from typing import Literal
 
 from pydantic_settings import BaseSettings
+from pydantic import Field, HttpUrl
 
 
 SupportedLocales = Literal["en-US", "fr-FR"]
@@ -76,18 +77,15 @@ class Settings(BaseSettings):
     ENVIRONMENT: SupportedEnvironments
 
     # Authentication config
-
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 1  # 1 day
     SECRET_KEY: str
     ALGORITHM: str = "HS256"  # TODO: Change to ES256 in the future
 
     # Base account config
-
     BASE_ACCOUNT_USERNAME: str
     BASE_ACCOUNT_PASSWORD: str
 
     # Database config
-
     POSTGRES_HOST: str
     POSTGRES_PORT: int
     POSTGRES_DB: str
@@ -100,9 +98,12 @@ class Settings(BaseSettings):
         """The URI for the database."""
 
     # Github config
-
     GITHUB_USER: str
     GITHUB_TOKEN: str
     ISSUE_LABELS: str
     REPOSITORY_NAME: str
     REPOSITORY_OWNER: str
+
+    # Sentry config
+    SENTRY_DSN: HttpUrl = Field(...)
+    SENTRY_TRACES_SAMPLE_RATE: float = Field(..., ge=0.0, le=1.0)
