@@ -2,6 +2,7 @@
 
 import logging
 from contextlib import asynccontextmanager
+import sentry_sdk
 from typing import Any, Dict
 
 from fastapi import FastAPI
@@ -14,9 +15,7 @@ from app.api.api import api_router
 from app.api.utils.endpoints import utils_router
 from app.core.config import settings
 from app.core.exception_handlers import integrity_error_handler
-from app.middlewares.exception_monitoring import ExceptionMonitoringMiddleware
 from app.middlewares.i18n import I18nMiddleware
-from app.core.utils.backend.alert_backend import alert_backend
 from app.db.pre_start import pre_start
 from app.dependencies import get_db
 from app.schemas.base import HTTPError
@@ -31,6 +30,12 @@ setup_logs("sqlalchemy", level=logging.WARNING)
 
 
 logger = logging.getLogger("app.main")
+
+
+sentry_sdk.init(
+    dsn=settings.SENTRY_DSN,
+    traces_sample_rate=settings.SENTRY_TRACES_SAMPLE_RATE,
+)
 
 
 def custom_generate_unique_id(route: APIRoute) -> str:
@@ -83,7 +88,6 @@ app = FastAPI(
     generate_unique_id_function=custom_generate_unique_id,
 )
 
-app.add_middleware(ExceptionMonitoringMiddleware, alert_backend=alert_backend()) # Should be the first middleware to catch all exceptions
 app.add_middleware(I18nMiddleware)
 app.add_middleware(TrustedHostMiddleware, allowed_hosts=settings.ALLOWED_HOSTS)
 app.add_middleware(

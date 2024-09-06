@@ -15,25 +15,22 @@ class ConfigProduction(Settings):
     LOG_LEVEL: int = logging.INFO
     ENVIRONMENT: SupportedEnvironments = "production"
 
-    """ Authentication config"""
+    # Authentication config
     # openssl rand -hex 32
     SECRET_KEY: str = Field(...)
 
-    """Base account config """
-
+    # Base account config
     BASE_ACCOUNT_USERNAME: str = "admin"
     BASE_ACCOUNT_PASSWORD: str = Field(...)
 
-    """Database config"""
-
+    # Database config
     POSTGRES_HOST: str = Field(...)
     POSTGRES_PORT: int = 5432
     POSTGRES_DB: str = Field(...)
     POSTGRES_USER: str = Field(...)
     POSTGRES_PASSWORD: str = Field(...)
 
-    """Github config"""
-
+    # Github config
     GITHUB_USER: str = Field(...)
     GITHUB_TOKEN: str = Field(...)
 

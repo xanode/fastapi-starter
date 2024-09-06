@@ -26,6 +26,7 @@ asyncpg = "^0.29.0"
 alembic-autogenerate-enums = "^0.1.2"
 tenacity = "^8.5.0"
 aiosqlite = "^0.20.0"
+sentry-sdk = {extras = ["fastapi"], version = "^1.45.0"}
 
 
 [tool.poetry.group.dev.dependencies]

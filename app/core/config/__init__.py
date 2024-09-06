@@ -14,7 +14,7 @@ logger = logging.getLogger("app.core.config")
 
 
 @lru_cache
-def select_settings(_env: str | None = os.getenv("ENVIRONMENT")):
+def select_settings(_env: str | None = os.getenv("ENVIRONMENT", "development")):
     """
     Returns the application settings based on the environment specified.
 
