@@ -23,7 +23,7 @@ This project is a starter template for a FastAPI project.
 - [x] Support of development, testing and production settings.
 - [x] Support of PostgreSQL and SQLite databases (other databases can be added with a plugin).
 - [x] Some commands to initialize the database, dump the data, etc.
-- [x] Automatically creates Issues on Github when an error occurs in production (log it to the terminal in development, this is configurable).
+- [x] Use Sentry to report errors.
 - [x] Translation and internationalization (i18n) of API errors and responses (some english and french translations are already implemented).
 
 ## Getting started
